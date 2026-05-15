@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ Glam Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--rose:#D4547E;--rose-light:#FBEAF0;--rose-dark:#72243E;--blush:#F4C0D1;--nude:#F5EDE8;--gold:#C9996B;--gold-light:#FAF0E8;--charcoal:#2C2424;--muted:#8C7B7B;--border:rgba(212,84,126,0.15);--border-strong:rgba(212,84,126,0.3);--shadow:0 2px 20px rgba(212,84,126,0.08);--radius:16px;--radius-sm:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--nude);color:var(--charcoal);min-height:100vh;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+#auth-screen{background:linear-gradient(160deg,#FBEAF0 0%,#F5EDE8 50%,#FAF0E8 100%);align-items:center;justify-content:center;padding:2rem;}
+.auth-card{background:white;border-radius:24px;padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 8px 60px rgba(212,84,126,0.12);border:1px solid var(--border);}
+.auth-logo{text-align:center;margin-bottom:2rem;}
+.auth-logo .wordmark{font-family:'Playfair Display',serif;font-size:2rem;font-weight:600;color:var(--rose-dark);}
+.auth-logo .tagline{font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:.5px;text-transform:uppercase;}
+.tab-row{display:flex;margin-bottom:2rem;background:var(--nude);border-radius:var(--radius-sm);padding:4px;}
+.tab-btn{flex:1;padding:9px;border:none;background:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;}
+.tab-btn.active{background:white;color:var(--rose);box-shadow:0 1px 8px rgba(212,84,126,.15);}
+.form-group{margin-bottom:1.25rem;}
+.form-group label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:6px;}
+.form-group input,.form-group select{width:100%;padding:12px 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--charcoal);background:white;transition:border-color .2s;outline:none;}
+.form-group input:focus,.form-group select:focus{border-color:var(--rose);}
+.btn-primary{width:100%;padding:14px;background:var(--rose);color:white;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;}
+.btn-primary:hover{background:var(--rose-dark);transform:translateY(-1px);}
+.auth-panel{display:none;}
+.auth-panel.active{display:block;}
+.error-msg{color:#E24B4A;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#FCEBEB;border-radius:8px;}
+#app-screen{background:var(--nude);}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+.topbar .wordmark{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--rose-dark);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.user-badge{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--blush);color:var(--rose-dark);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+.btn-ghost{padding:8px 14px;border:1.5px solid var(--border-strong);border-radius:8px;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;}
+.btn-ghost:hover{border-color:var(--rose);color:var(--rose);}
+.nav-tabs{display:flex;border-bottom:1px solid var(--border);background:white;padding:0 2rem;overflow-x:auto;}
+.nav-tab{padding:14px 16px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;}
+.nav-tab.active{color:var(--rose);border-bottom-color:var(--rose);}
+.nav-tab:hover:not(.active){color:var(--charcoal);}
+.content{flex:1;padding:2rem;max-width:1100px;margin:0 auto;width:100%;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;color:var(--charcoal);}
+.section-sub{font-size:14px;color:var(--muted);margin-top:2px;}
+.upload-zone{border:2px dashed var(--border-strong);border-radius:var(--radius);padding:3rem 2rem;text-align:center;background:white;cursor:pointer;transition:all .2s;margin-bottom:1.5rem;position:relative;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--rose);background:var(--rose-light);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:3rem;margin-bottom:1rem;}
+.upload-zone h3{font-size:16px;font-weight:500;color:var(--charcoal);margin-bottom:6px;}
+.upload-zone p{font-size:14px;color:var(--muted);}
+.camera-section{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;}
+.camera-preview{width:100%;max-width:400px;border-radius:12px;background:#000;display:block;margin:1rem auto;}
+.camera-btns{display:flex;gap:10px;justify-content:center;margin-top:1rem;flex-wrap:wrap;}
+.identify-result{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1.5rem;display:none;margin-bottom:1.5rem;}
+.identify-result.visible{display:block;}
+.result-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
+.result-img{width:80px;height:80px;border-radius:12px;object-fit:cover;border:1px solid var(--border);}
+.result-info h3{font-size:17px;font-weight:500;color:var(--charcoal);margin-bottom:4px;}
+.brand-badge{display:inline-block;padding:3px 10px;background:var(--rose-light);color:var(--rose);border-radius:20px;font-size:12px;font-weight:500;margin-bottom:6px;}
+.result-meta{font-size:13px;color:var(--muted);}
+.shade-row{display:flex;align-items:center;gap:10px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+.shade-swatch{width:28px;height:28px;border-radius:50%;border:2px solid white;box-shadow:0 0 0 1px var(--border-strong);flex-shrink:0;}
+.result-actions{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;}
+.btn-sm{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn-rose{background:var(--rose);color:white;border:none;}
+.btn-rose:hover{background:var(--rose-dark);}
+.btn-outline{background:none;color:var(--rose);border:1.5px solid var(--rose);}
+.btn-outline:hover{background:var(--rose-light);}
+.btn-gray{background:none;color:var(--muted);border:1.5px solid var(--border-strong);}
+.btn-gray:hover{border-color:var(--charcoal);color:var(--charcoal);}
+.face-analysis-card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;}
+.face-photo-preview{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--blush);display:block;margin:0 auto 1.5rem;}
+.face-feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:1.5rem 0;}
+.feature-card{background:var(--rose-light);border-radius:12px;padding:14px;border:1px solid var(--border);}
+.feature-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--rose);font-weight:500;margin-bottom:4px;}
+.feature-value{font-size:15px;font-weight:500;color:var(--charcoal);}
+.feature-tip{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4;}
+.ml-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#EAF3DE;color:#3B6D11;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:1rem;}
+.looks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;}
+.look-card{background:white;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:all .2s;}
+.look-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.look-card-banner{height:160px;display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;}
+.look-card-vibe{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;background:white;color:var(--rose);border:1px solid var(--border);}
+.look-card-body{padding:1rem;}
+.look-name{font-size:16px;font-weight:500;color:var(--charcoal);margin-bottom:4px;}
+.look-desc{font-size:13px;color:var(--muted);line-height:1.4;margin-bottom:10px;}
+.look-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.look-tag{padding:3px 10px;border-radius:12px;font-size:11px;background:var(--nude);color:var(--muted);border:1px solid var(--border);}
+.pinterest-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border-radius:8px;background:#E60023;color:white;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;text-decoration:none;}
+.pinterest-btn:hover{background:#c0001d;}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;}
+.filter-chip{padding:7px 14px;border:1.5px solid var(--border-strong);border-radius:20px;background:white;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;color:var(--muted);transition:all .2s;}
+.filter-chip.active{background:var(--rose);color:white;border-color:var(--rose);}
+.filter-chip:hover:not(.active){border-color:var(--rose);color:var(--rose);}
+.inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.product-card{background:white;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:all .2s;cursor:pointer;}
+.product-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.product-img-wrap{height:140px;background:var(--nude);display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative;}
+.product-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.product-category-tag{position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:500;background:white;color:var(--muted);border:1px solid var(--border);}
+.product-info{padding:12px;}
+.product-brand{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--rose);font-weight:500;margin-bottom:3px;}
+.product-name{font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:6px;line-height:1.3;}
+.product-shade{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.mini-swatch{width:14px;height:14px;border-radius:50%;border:1px solid var(--border-strong);flex-shrink:0;}
+.shade-profile-card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;}
+.skin-tones{display:flex;gap:10px;flex-wrap:wrap;margin:1rem 0;}
+.tone-option{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+.tone-circle{width:48px;height:48px;border-radius:50%;border:3px solid transparent;transition:all .2s;}
+.tone-option.selected .tone-circle{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-light);}
+.tone-name{font-size:11px;color:var(--muted);text-align:center;}
+.shade-category{margin-bottom:1.5rem;}
+.shade-category h4{font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:10px;}
+.shade-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.shade-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border-strong);cursor:pointer;transition:all .2s;font-size:13px;background:white;font-family:'DM Sans',sans-serif;}
+.shade-pill.selected{border-color:var(--rose);background:var(--rose-light);color:var(--rose);}
+.reco-intro{background:linear-gradient(135deg,var(--rose-light),var(--gold-light));border-radius:var(--radius);padding:1.5rem 2rem;margin-bottom:1.5rem;border:1px solid var(--border);}
+.reco-intro h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--rose-dark);margin-bottom:6px;}
+.reco-intro p{font-size:14px;color:var(--muted);}
+.reco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.reco-card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1.25rem;transition:all .2s;}
+.reco-card:hover{box-shadow:var(--shadow);}
+.reco-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.reco-emoji{font-size:1.8rem;}
+.reco-name{font-size:15px;font-weight:500;color:var(--charcoal);}
+.reco-brand{font-size:12px;color:var(--rose);font-weight:500;}
+.reco-reason{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+.reco-shade-match{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--gold-light);border-radius:8px;font-size:12px;color:var(--gold);font-weight:500;}
+.ai-response{background:var(--rose-light);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-top:1rem;border-left:3px solid var(--rose);font-size:14px;line-height:1.6;color:var(--charcoal);}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(245,237,232,.9);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:1rem;backdrop-filter:blur(6px);}
+.loading-overlay.visible{display:flex;}
+.spinner{width:48px;height:48px;border:3px solid var(--blush);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:15px;color:var(--rose-dark);font-weight:500;text-align:center;max-width:300px;line-height:1.5;}
+.loading-sub{font-size:12px;color:var(--muted);text-align:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,36,.5);z-index:300;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.visible{display:flex;}
+.modal{background:white;border-radius:20px;padding:2rem;width:100%;max-width:440px;box-shadow:0 20px 80px rgba(44,36,36,.2);max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1.25rem;color:var(--charcoal);}
+.modal-actions{display:flex;gap:10px;margin-top:1.5rem;}
+.modal-actions button{flex:1;}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;}
+.empty-state h3{font-size:16px;font-weight:500;color:var(--charcoal);margin-bottom:6px;}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--charcoal);color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:500;}
+.toast.show{transform:translateY(0);opacity:1;}
+.server-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;margin-left:8px;}
+.server-online{background:#EAF3DE;color:#3B6D11;}
+.server-offline{background:#FCEBEB;color:#A32D2D;}
+.banner-oval{background:linear-gradient(135deg,#FBEAF0,#F4C0D1);}
+.banner-round{background:linear-gradient(135deg,#FAF0E8,#F5D5BE);}
+.banner-square{background:linear-gradient(135deg,#EAF3DE,#C0DD97);}
+.banner-heart{background:linear-gradient(135deg,#FCEBEB,#F7C1C1);}
+.banner-oblong{background:linear-gradient(135deg,#E6F1FB,#B5D4F4);}
+.banner-diamond{background:linear-gradient(135deg,#FAEEDA,#FAC775);}
+.banner-default{background:linear-gradient(135deg,#FBEAF0,#FAF0E8);}
+@media(max-width:600px){.topbar{padding:0 1rem;}.nav-tabs{padding:0 1rem;}.content{padding:1rem;}.nav-tab{padding:12px 10px;font-size:12px;}.auth-card{padding:2rem 1.5rem;}}
+
+/* ── ONBOARDING ── */
+#onboarding-screen{background:linear-gradient(160deg,#FBEAF0 0%,#F5EDE8 50%,#FAF0E8 100%);align-items:center;justify-content:flex-start;padding:0;}
+.ob-topbar{background:#72243E;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;width:100%;}
+.ob-wordmark{color:#F4C0D1;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;}
+.ob-user{display:flex;align-items:center;gap:8px;color:#F4C0D1;font-size:13px;}
+.ob-avatar{width:30px;height:30px;border-radius:50%;background:#D4547E;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
+.ob-step-bar{background:#4B1528;padding:10px 24px;display:flex;align-items:center;gap:10px;width:100%;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:#993556;flex-shrink:0;transition:background .25s;}
+.ob-dot.active{background:#F4C0D1;}
+.ob-dot.done{background:#ED93B1;}
+.ob-line{flex:1;height:1px;background:#993556;}
+.ob-step-label{font-size:11px;color:#ED93B1;white-space:nowrap;}
+.ob-progress-wrap{width:100%;height:4px;background:rgba(212,84,126,0.2);}
+.ob-progress-fill{height:100%;background:var(--rose);transition:width .4s;}
+.ob-body{flex:1;width:100%;max-width:560px;margin:0 auto;padding:2rem 1.5rem;overflow-y:auto;}
+.ob-pane{display:none;}
+.ob-pane.active{display:block;}
+.ob-card{background:white;border-radius:20px;border:1px solid var(--border);padding:2rem;margin-bottom:1rem;}
+.ob-welcome-icon{font-size:3rem;text-align:center;margin-bottom:1rem;}
+.ob-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--charcoal);text-align:center;margin-bottom:6px;}
+.ob-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:1.5rem;}
+.ob-step-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem;}
+.ob-step-card{background:var(--rose-light);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);}
+.ob-step-card .osc-icon{font-size:1.5rem;margin-bottom:6px;}
+.ob-step-card .osc-title{font-size:12px;font-weight:500;color:var(--charcoal);margin-bottom:2px;}
+.ob-step-card .osc-sub{font-size:11px;color:var(--muted);}
+.ob-btn{width:100%;padding:13px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+.ob-btn:hover{background:var(--rose-dark);}
+.ob-skip{width:100%;padding:10px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;}
+.ob-skip:hover{color:var(--charcoal);}
+.ob-divider{display:flex;align-items:center;gap:10px;margin:4px 0;}
+.ob-divider span{font-size:11px;color:var(--muted);white-space:nowrap;}
+.ob-divider::before,.ob-divider::after{content:'';flex:1;height:0.5px;background:var(--border-strong);}
+.ob-step-num{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--rose);font-weight:500;margin-bottom:4px;}
+.ob-step-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:var(--charcoal);margin-bottom:6px;}
+.ob-step-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1.25rem;}
+.ob-upload-zone{border:2px dashed var(--border-strong);border-radius:var(--radius);padding:2rem;text-align:center;background:white;cursor:pointer;transition:all .2s;margin-bottom:1rem;position:relative;}
+.ob-upload-zone:hover{border-color:var(--rose);background:var(--rose-light);}
+.ob-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.ob-tip{background:#EAF3DE;border-radius:10px;padding:10px 14px;margin-bottom:1rem;border:0.5px solid #C0DD97;}
+.ob-tip strong{color:#3B6D11;font-size:12px;}
+.ob-tip p{color:#3B6D11;font-size:12px;margin-top:2px;}
+.ob-done-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.ob-stat{background:var(--rose-light);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);}
+.ob-stat-val{font-size:1.4rem;font-weight:500;color:var(--rose);margin-bottom:3px;}
+.ob-stat-label{font-size:11px;color:var(--muted);}
+.ob-skipped-box{background:#F1EFE8;border-radius:10px;padding:12px 14px;margin-bottom:1rem;border:0.5px solid #D3D1C7;}
+.ob-skipped-box strong{font-size:12px;color:#444441;}
+.ob-skipped-box ul{margin-top:6px;padding-left:0;list-style:none;}
+.ob-skipped-box li{font-size:12px;color:#5F5E5A;margin-bottom:3px;}
+.ob-skin-tones{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;}
+.ob-tone-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.ob-tone-circle{width:40px;height:40px;border-radius:50%;border:2.5px solid transparent;transition:all .2s;}
+.ob-tone-opt.selected .ob-tone-circle{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-light);}
+.ob-tone-name{font-size:10px;color:var(--muted);}
+.ob-shade-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.ob-shade-pill{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border-strong);font-size:12px;background:white;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;}
+.ob-shade-pill.selected{background:var(--rose-light);color:var(--rose);border-color:var(--rose);}
+.ob-cat-label{font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:8px;}
+.ob-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.ob-option-card{background:white;border-radius:12px;border:1.5px solid var(--border-strong);padding:16px;text-align:center;cursor:pointer;transition:all .2s;}
+.ob-option-card:hover{border-color:var(--rose);background:var(--rose-light);}
+.ob-option-card .oc-icon{font-size:1.8rem;margin-bottom:6px;}
+.ob-option-card .oc-title{font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:2px;}
+.ob-option-card .oc-sub{font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="wordmark">✨ Glam Vault</div>
+      <div class="tagline">Powered by AI + Machine Learning</div>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+    <div id="login-panel" class="auth-panel active">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <div class="error-msg" id="login-error">Invalid email or password.</div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+    </div>
+    <div id="signup-panel" class="auth-panel">
+      <div class="form-group"><label>Your Name</label><input type="text" id="signup-name" placeholder="First name"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signup-password" placeholder="Create a password"></div>
+      <div class="form-group">
+        <label>Skin Tone</label>
+        <select id="signup-tone">
+          <option value="">Select your skin tone…</option>
+          <option value="fair">Fair</option><option value="light">Light</option>
+          <option value="light-medium">Light Medium</option><option value="medium">Medium</option>
+          <option value="medium-tan">Medium Tan</option><option value="tan">Tan</option>
+          <option value="deep">Deep</option><option value="rich">Rich</option>
+        </select>
+      </div>
+      <div class="error-msg" id="signup-error">Please fill in all fields.</div>
+      <button class="btn-primary" onclick="handleSignup()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ONBOARDING SCREEN ══ -->
+<div id="onboarding-screen" class="screen">
+  <div class="ob-topbar">
+    <div class="ob-wordmark">✨ Glam Vault</div>
+    <div class="ob-user">
+      <div class="ob-avatar" id="ob-avatar">?</div>
+      <span id="ob-name"></span>
+    </div>
+  </div>
+  <div class="ob-step-bar" id="ob-step-bar" style="display:none;">
+    <div class="ob-dot active" id="ob-dot-1"></div>
+    <div class="ob-line"></div>
+    <div class="ob-dot" id="ob-dot-2"></div>
+    <div class="ob-line"></div>
+    <div class="ob-dot" id="ob-dot-3"></div>
+    <div class="ob-line"></div>
+    <div class="ob-dot" id="ob-dot-4"></div>
+    <span class="ob-step-label" id="ob-step-label">Step 1 of 4</span>
+  </div>
+  <div class="ob-progress-wrap" id="ob-progress-wrap" style="display:none;">
+    <div class="ob-progress-fill" id="ob-progress-fill" style="width:0%"></div>
+  </div>
+
+  <div class="ob-body">
+
+    <!-- PANE 0: Welcome -->
+    <div id="ob-pane-0" class="ob-pane active">
+      <div class="ob-card">
+        <div class="ob-welcome-icon">✨</div>
+        <div class="ob-title" id="ob-welcome-title">Welcome to Glam Vault!</div>
+        <div class="ob-sub">Let's set up your personal makeup sanctuary in just a few steps. You can skip anything and come back to it later.</div>
+        <div class="ob-step-cards">
+          <div class="ob-step-card"><div class="osc-icon">🪞</div><div class="osc-title">Face analysis</div><div class="osc-sub">AI reads your features</div></div>
+          <div class="ob-step-card"><div class="osc-icon">🎨</div><div class="osc-title">Shade profile</div><div class="osc-sub">Log your go-to shades</div></div>
+          <div class="ob-step-card"><div class="osc-icon">💄</div><div class="osc-title">Inventory</div><div class="osc-sub">Add products you own</div></div>
+        </div>
+        <button class="ob-btn" onclick="obGoTo(1)">Let's get started</button>
+        <button class="ob-skip" onclick="obSkipAll()">Skip setup — take me straight to the app</button>
+      </div>
+    </div>
+
+    <!-- PANE 1: Selfie / Face Analysis -->
+    <div id="ob-pane-1" class="ob-pane">
+      <div class="ob-card">
+        <div class="ob-step-num">Step 1 of 4 — face analysis</div>
+        <div class="ob-step-title">Upload a selfie</div>
+        <div class="ob-step-desc">Our ML engine (MediaPipe + OpenCV) detects 468 facial landmarks to classify your face shape, eye shape, undertone, and more — then generates makeup looks designed just for you.</div>
+        <div class="ob-upload-zone" id="ob-face-upload">
+          <input type="file" accept="image/*" onchange="obHandleFace(event)" id="ob-face-input">
+          <div style="font-size:2rem;margin-bottom:8px;">🪞</div>
+          <div style="font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:4px;">Drop your selfie here</div>
+          <div style="font-size:12px;color:var(--muted);">Front-facing · good lighting · hair pulled back</div>
+        </div>
+        <div class="ob-tip">
+          <strong>Why do this?</strong>
+          <p>The AI generates 6 custom makeup looks tailored to your exact face shape and features, with Pinterest links for each one.</p>
+        </div>
+        <button class="ob-btn" onclick="obGoTo(2)">Skip for now, do shade profile</button>
+        <div class="ob-divider"><span>or skip everything below</span></div>
+        <button class="ob-skip" onclick="obSkip(1)">Skip face analysis — I'll do it later from the app</button>
+      </div>
+    </div>
+
+    <!-- PANE 2: Shade Profile -->
+    <div id="ob-pane-2" class="ob-pane">
+      <div class="ob-card">
+        <div class="ob-step-num">Step 2 of 4 — shade profile</div>
+        <div class="ob-step-title">Tell us your shades</div>
+        <div class="ob-step-desc">This powers your personalized product recommendations. Select anything that applies — you can edit it anytime.</div>
+
+        <div class="ob-cat-label">Skin tone</div>
+        <div class="ob-skin-tones" id="ob-skin-tones">
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'fair')" data-tone="fair"><div class="ob-tone-circle" style="background:#FBECD9;"></div><div class="ob-tone-name">Fair</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'light')" data-tone="light"><div class="ob-tone-circle" style="background:#F5D5BE;"></div><div class="ob-tone-name">Light</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'light-medium')" data-tone="light-medium"><div class="ob-tone-circle" style="background:#E8BFA2;"></div><div class="ob-tone-name">Lt. Med</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'medium')" data-tone="medium"><div class="ob-tone-circle" style="background:#D4A283;"></div><div class="ob-tone-name">Medium</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'medium-tan')" data-tone="medium-tan"><div class="ob-tone-circle" style="background:#BE8860;"></div><div class="ob-tone-name">Med. Tan</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'tan')" data-tone="tan"><div class="ob-tone-circle" style="background:#9E6B44;"></div><div class="ob-tone-name">Tan</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'deep')" data-tone="deep"><div class="ob-tone-circle" style="background:#7A4A2A;"></div><div class="ob-tone-name">Deep</div></div>
+          <div class="ob-tone-opt" onclick="obSelectTone(this,'rich')" data-tone="rich"><div class="ob-tone-circle" style="background:#4A2810;"></div><div class="ob-tone-name">Rich</div></div>
+        </div>
+
+        <div class="ob-cat-label">Lip shades I love</div>
+        <div class="ob-shade-grid" id="ob-lip-prefs">
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','nude')"><span style="width:12px;height:12px;border-radius:50%;background:#C49884;display:inline-block;flex-shrink:0;"></span>Nude</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','berry')"><span style="width:12px;height:12px;border-radius:50%;background:#8B3A6B;display:inline-block;flex-shrink:0;"></span>Berry</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','red')"><span style="width:12px;height:12px;border-radius:50%;background:#C0392B;display:inline-block;flex-shrink:0;"></span>Red</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','pink')"><span style="width:12px;height:12px;border-radius:50%;background:#E091B2;display:inline-block;flex-shrink:0;"></span>Pink</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','mauve')"><span style="width:12px;height:12px;border-radius:50%;background:#9B6B7A;display:inline-block;flex-shrink:0;"></span>Mauve</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','coral')"><span style="width:12px;height:12px;border-radius:50%;background:#E8815A;display:inline-block;flex-shrink:0;"></span>Coral</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'lip','brown')"><span style="width:12px;height:12px;border-radius:50%;background:#8B5E3C;display:inline-block;flex-shrink:0;"></span>Brown</div>
+        </div>
+
+        <div class="ob-cat-label">Eye shadow style</div>
+        <div class="ob-shade-grid" id="ob-eye-prefs">
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'eye','neutral')">Neutral / Warm</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'eye','smoky')">Smoky</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'eye','colorful')">Colorful</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'eye','glitter')">Glitter</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'eye','earthy')">Earthy</div>
+        </div>
+
+        <div class="ob-cat-label">Finish preference</div>
+        <div class="ob-shade-grid" id="ob-finish-prefs">
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'finish','matte')">Matte</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'finish','dewy')">Dewy / Glow</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'finish','satin')">Satin</div>
+          <div class="ob-shade-pill" onclick="obToggleShade(this,'finish','natural')">Natural</div>
+        </div>
+
+        <button class="ob-btn" onclick="obSaveShades()">Save shade profile &amp; continue</button>
+        <div class="ob-divider"><span>or skip</span></div>
+        <button class="ob-skip" onclick="obSkip(2)">Skip shades — I'll fill this in later</button>
+      </div>
+    </div>
+
+    <!-- PANE 3: Add Products -->
+    <div id="ob-pane-3" class="ob-pane">
+      <div class="ob-card">
+        <div class="ob-step-num">Step 3 of 4 — your inventory</div>
+        <div class="ob-step-title">Add your makeup</div>
+        <div class="ob-step-desc">Photograph your products or add them manually. Even just 3–5 products helps the AI give better recommendations right away.</div>
+        <div class="ob-two-col">
+          <div class="ob-option-card" onclick="obGoTo(4);setTimeout(()=>{switchTab('identify')},300);">
+            <div class="oc-icon">📷</div>
+            <div class="oc-title">Photo scan</div>
+            <div class="oc-sub">AI identifies the product from a photo</div>
+          </div>
+          <div class="ob-option-card" onclick="obGoTo(4);setTimeout(()=>{switchTab('inventory');openManualAdd();},300);">
+            <div class="oc-icon">✏️</div>
+            <div class="oc-title">Add manually</div>
+            <div class="oc-sub">Type brand, name &amp; shade</div>
+          </div>
+        </div>
+        <div class="ob-tip">
+          <strong>Tip: start small</strong>
+          <p>Add a few items now, then keep scanning as you use your makeup. Your vault grows with you.</p>
+        </div>
+        <button class="ob-btn" onclick="obGoTo(4)">Done adding — show me my vault</button>
+        <div class="ob-divider"><span>or skip</span></div>
+        <button class="ob-skip" onclick="obSkip(3)">Skip for now — I'll add products later</button>
+      </div>
+    </div>
+
+    <!-- PANE 4: Done -->
+    <div id="ob-pane-4" class="ob-pane">
+      <div class="ob-card">
+        <div class="ob-welcome-icon" id="ob-done-icon">🎉</div>
+        <div class="ob-title" id="ob-done-title">You're all set!</div>
+        <div class="ob-sub" id="ob-done-sub">Your Glam Vault is ready. Here's what we set up:</div>
+        <div class="ob-done-summary" id="ob-done-summary"></div>
+        <div class="ob-skipped-box" id="ob-skipped-box" style="display:none;">
+          <strong>Skipped a few things — no worries!</strong>
+          <ul id="ob-skipped-list"></ul>
+        </div>
+        <button class="ob-btn" onclick="obFinish()">Take me to my vault ✨</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <div class="topbar">
+    <div class="wordmark">✨ Glam Vault <span class="server-badge" id="server-badge">⬤ checking…</span></div>
+    <div class="topbar-right">
+      <div class="user-badge"><div class="avatar" id="user-avatar">?</div><span id="user-name-display"></span></div>
+      <button class="btn-ghost" onclick="handleLogout()">Sign out</button>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('identify')">🔍 Identify</button>
+    <button class="nav-tab" onclick="switchTab('face')">🪞 Face Analysis</button>
+    <button class="nav-tab" onclick="switchTab('inventory')">💄 My Inventory</button>
+    <button class="nav-tab" onclick="switchTab('shades')">🎨 My Shades</button>
+    <button class="nav-tab" onclick="switchTab('recs')">✨ AI Picks</button>
+  </div>
+
+  <div class="content">
+
+    <!-- IDENTIFY -->
+    <div id="identify-tab" class="tab-content active">
+      <div class="section-header">
+        <div><div class="section-title">Identify Makeup</div><div class="section-sub">Upload a photo — Claude Vision identifies it instantly</div></div>
+      </div>
+      <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <input type="file" accept="image/*" onchange="handleFileSelect(event)" id="file-input">
+        <div class="upload-icon">📷</div>
+        <h3>Drop your makeup photo here</h3>
+        <p>or click to browse — JPG, PNG supported</p>
+      </div>
+      <div class="identify-result" id="identify-result">
+        <div class="result-header">
+          <img id="result-img" class="result-img" src="" alt="Product">
+          <div class="result-info">
+            <div id="result-brand" class="brand-badge">Brand</div>
+            <h3 id="result-name">Product Name</h3>
+            <div class="result-meta" id="result-category">Category</div>
+          </div>
+        </div>
+        <div class="ai-response" id="identify-ai-text"></div>
+        <div class="shade-row" id="shade-row" style="display:none">
+          <div class="shade-swatch" id="shade-swatch"></div>
+          <div id="shade-label"></div>
+        </div>
+        <div class="result-actions">
+          <button class="btn-sm btn-rose" onclick="addToInventory()">Add to Inventory</button>
+          <button class="btn-sm btn-outline" onclick="resetIdentify()">Try Another</button>
+        </div>
+      </div>
+      <div id="brand-not-found" style="display:none;margin-top:1rem;">
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1.5rem;">
+          <h4 style="font-size:15px;font-weight:500;margin-bottom:10px;">Brand not in our database?</h4>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="custom-brand-input" placeholder="Brand name…" style="flex:1;padding:10px 14px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:14px;outline:none;">
+            <button class="btn-sm btn-rose" onclick="addCustomBrand()">Add Brand</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACE ANALYSIS -->
+    <div id="face-tab" class="tab-content">
+      <div class="section-header">
+        <div><div class="section-title">Face Analysis</div><div class="section-sub">MediaPipe ML + Claude AI — real facial geometry analysis</div></div>
+      </div>
+      <div id="face-upload-section">
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;">
+          <div class="ml-badge">🧠 Powered by MediaPipe + OpenCV + scikit-learn + Claude AI</div>
+          <h4 style="font-size:16px;font-weight:500;margin-bottom:8px;">How the ML analysis works</h4>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:1.25rem;">The Python backend uses <strong>MediaPipe Face Mesh</strong> to detect 468 facial landmarks, then applies geometric algorithms to classify your face shape, <strong>OpenCV</strong> color analysis for skin undertone, and <strong>scikit-learn KMeans</strong> for dominant color extraction. Claude AI then generates personalized looks from those measurements.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+            <div style="background:var(--nude);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:var(--muted);">💡 Good lighting</div>
+            <div style="background:var(--nude);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:var(--muted);">😐 Neutral expression</div>
+            <div style="background:var(--nude);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:var(--muted);">👁️ Hair pulled back</div>
+            <div style="background:var(--nude);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:var(--muted);">📸 Front-facing selfie</div>
+          </div>
+        </div>
+        <div class="upload-zone" id="face-upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFaceDrop(event)">
+          <input type="file" accept="image/*" onchange="handleFaceFileSelect(event)" id="face-file-input">
+          <div class="upload-icon">🪞</div>
+          <h3>Upload your selfie</h3>
+          <p>or use the camera below</p>
+        </div>
+        <div class="camera-section">
+          <h4 style="font-size:15px;font-weight:500;margin-bottom:6px;">Or use your camera</h4>
+          <video id="camera-video" class="camera-preview" style="display:none;max-height:300px;" autoplay playsinline></video>
+          <canvas id="face-canvas" style="display:none;"></canvas>
+          <div class="camera-btns">
+            <button class="btn-sm btn-outline" onclick="startCamera()" id="start-cam-btn">📷 Open Camera</button>
+            <button class="btn-sm btn-rose" onclick="capturePhoto()" id="capture-btn" style="display:none;">📸 Capture</button>
+            <button class="btn-sm btn-gray" onclick="stopCamera()" id="stop-cam-btn" style="display:none;">✕ Close</button>
+          </div>
+        </div>
+      </div>
+      <div id="face-results-section" style="display:none;">
+        <div class="face-analysis-card">
+          <img id="face-photo-display" class="face-photo-preview" src="" alt="Your photo">
+          <div style="text-align:center;margin-bottom:1rem;">
+            <div class="ml-badge">✅ Analyzed by MediaPipe (468 landmarks) + Claude AI</div>
+          </div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;text-align:center;margin-bottom:4px;" id="face-result-headline">Your Face Profile</h3>
+          <p style="text-align:center;font-size:14px;color:var(--muted);margin-bottom:1.5rem;" id="face-result-sub"></p>
+          <div class="face-feature-grid" id="face-feature-grid"></div>
+          <div class="ai-response" id="face-ai-narrative" style="margin-top:1rem;"></div>
+          <div style="margin-top:1.5rem;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-sm btn-rose" onclick="showLooks()">✨ View My Looks</button>
+            <button class="btn-sm btn-outline" onclick="resetFaceAnalysis()">Try a Different Photo</button>
+          </div>
+        </div>
+        <div id="looks-section" style="display:none;">
+          <div class="section-header" style="margin-top:2rem;">
+            <div><div class="section-title">Looks For You</div><div class="section-sub" id="looks-sub"></div></div>
+          </div>
+          <div class="looks-grid" id="looks-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div id="inventory-tab" class="tab-content">
+      <div class="section-header">
+        <div><div class="section-title">My Makeup Inventory</div><div class="section-sub" id="inventory-count">0 products saved</div></div>
+        <button class="btn-sm btn-rose" onclick="openManualAdd()">+ Add Manually</button>
+      </div>
+      <div class="filters" id="brand-filters"><button class="filter-chip active" onclick="filterInventory('all',this)">All</button></div>
+      <div class="inventory-grid" id="inventory-grid">
+        <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">💄</div><h3>No products yet</h3><p>Use the Identify tab to scan your makeup!</p></div>
+      </div>
+    </div>
+
+    <!-- SHADES -->
+    <div id="shades-tab" class="tab-content">
+      <div class="section-header">
+        <div><div class="section-title">My Shade Profile</div><div class="section-sub">Saved to your account for personalized recs</div></div>
+        <button class="btn-sm btn-rose" onclick="saveShadeProfile()">Save Profile</button>
+      </div>
+      <div class="shade-profile-card">
+        <h4 style="font-size:16px;font-weight:500;margin-bottom:12px;">Skin Tone</h4>
+        <div class="skin-tones" id="skin-tones">
+          <div class="tone-option" onclick="selectTone(this,'fair')" data-tone="fair"><div class="tone-circle" style="background:#FBECD9;"></div><div class="tone-name">Fair</div></div>
+          <div class="tone-option" onclick="selectTone(this,'light')" data-tone="light"><div class="tone-circle" style="background:#F5D5BE;"></div><div class="tone-name">Light</div></div>
+          <div class="tone-option" onclick="selectTone(this,'light-medium')" data-tone="light-medium"><div class="tone-circle" style="background:#E8BFA2;"></div><div class="tone-name">Lt. Med</div></div>
+          <div class="tone-option" onclick="selectTone(this,'medium')" data-tone="medium"><div class="tone-circle" style="background:#D4A283;"></div><div class="tone-name">Medium</div></div>
+          <div class="tone-option" onclick="selectTone(this,'medium-tan')" data-tone="medium-tan"><div class="tone-circle" style="background:#BE8860;"></div><div class="tone-name">Med. Tan</div></div>
+          <div class="tone-option" onclick="selectTone(this,'tan')" data-tone="tan"><div class="tone-circle" style="background:#9E6B44;"></div><div class="tone-name">Tan</div></div>
+          <div class="tone-option" onclick="selectTone(this,'deep')" data-tone="deep"><div class="tone-circle" style="background:#7A4A2A;"></div><div class="tone-name">Deep</div></div>
+          <div class="tone-option" onclick="selectTone(this,'rich')" data-tone="rich"><div class="tone-circle" style="background:#4A2810;"></div><div class="tone-name">Rich</div></div>
+        </div>
+      </div>
+      <div class="shade-profile-card">
+        <h4 style="font-size:16px;font-weight:500;margin-bottom:16px;">Your Preferences</h4>
+        <div class="shade-category"><h4>Finish</h4><div class="shade-grid" id="finish-prefs">
+          <div class="shade-pill" onclick="toggleShade(this,'finish','matte')">Matte</div>
+          <div class="shade-pill" onclick="toggleShade(this,'finish','dewy')">Dewy</div>
+          <div class="shade-pill" onclick="toggleShade(this,'finish','satin')">Satin</div>
+          <div class="shade-pill" onclick="toggleShade(this,'finish','natural')">Natural</div>
+        </div></div>
+        <div class="shade-category"><h4>Lip shades</h4><div class="shade-grid" id="lip-prefs">
+          <div class="shade-pill" onclick="toggleShade(this,'lip','nude')"><span class="mini-swatch" style="background:#C49884"></span>Nude</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','berry')"><span class="mini-swatch" style="background:#8B3A6B"></span>Berry</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','red')"><span class="mini-swatch" style="background:#C0392B"></span>Red</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','pink')"><span class="mini-swatch" style="background:#E091B2"></span>Pink</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','mauve')"><span class="mini-swatch" style="background:#9B6B7A"></span>Mauve</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','coral')"><span class="mini-swatch" style="background:#E8815A"></span>Coral</div>
+          <div class="shade-pill" onclick="toggleShade(this,'lip','brown')"><span class="mini-swatch" style="background:#8B5E3C"></span>Brown</div>
+        </div></div>
+        <div class="shade-category"><h4>Eye shadow style</h4><div class="shade-grid" id="eye-prefs">
+          <div class="shade-pill" onclick="toggleShade(this,'eye','neutral')">Neutral / Warm</div>
+          <div class="shade-pill" onclick="toggleShade(this,'eye','smoky')">Smoky</div>
+          <div class="shade-pill" onclick="toggleShade(this,'eye','colorful')">Colorful</div>
+          <div class="shade-pill" onclick="toggleShade(this,'eye','glitter')">Glitter</div>
+          <div class="shade-pill" onclick="toggleShade(this,'eye','earthy')">Earthy</div>
+        </div></div>
+        <div class="shade-category"><h4>Blush / bronzer</h4><div class="shade-grid" id="blush-prefs">
+          <div class="shade-pill" onclick="toggleShade(this,'blush','peachy')"><span class="mini-swatch" style="background:#F0A882"></span>Peachy</div>
+          <div class="shade-pill" onclick="toggleShade(this,'blush','rosy')"><span class="mini-swatch" style="background:#E891A8"></span>Rosy</div>
+          <div class="shade-pill" onclick="toggleShade(this,'blush','bronzed')"><span class="mini-swatch" style="background:#C48840"></span>Bronzed</div>
+          <div class="shade-pill" onclick="toggleShade(this,'blush','mauve-blush')"><span class="mini-swatch" style="background:#B07888"></span>Mauve</div>
+          <div class="shade-pill" onclick="toggleShade(this,'blush','berry-blush')"><span class="mini-swatch" style="background:#9A4870"></span>Berry</div>
+        </div></div>
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+          <h4 style="margin-bottom:10px;font-size:14px;font-weight:500;">Foundation shade number</h4>
+          <input type="text" id="foundation-shade" placeholder="e.g. NW25, 110W, 240N…" style="width:100%;padding:10px 14px;border:1.5px solid var(--border-strong);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+      </div>
+    </div>
+
+    <!-- RECS -->
+    <div id="recs-tab" class="tab-content">
+      <div class="section-header">
+        <div><div class="section-title">AI Picks For You</div><div class="section-sub">Personalized by shade profile + face analysis</div></div>
+        <button class="btn-sm btn-rose" onclick="fetchRecommendations()">Refresh ✨</button>
+      </div>
+      <div class="reco-intro">
+        <h3>Your personal makeup stylist 💫</h3>
+        <p id="reco-intro-text">Complete your shade profile to get recommendations tailored to you.</p>
+      </div>
+      <div class="reco-grid" id="reco-grid">
+        <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">✨</div><h3>Set up your shade profile first</h3><p>Head to My Shades to get started</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Analyzing…</div>
+  <div class="loading-sub" id="loading-sub"></div>
+</div>
+
+<!-- MANUAL ADD MODAL -->
+<div class="modal-overlay" id="manual-modal">
+  <div class="modal">
+    <h3>Add Product Manually</h3>
+    <div class="form-group">
+      <label>Brand</label>
+      <select id="manual-brand">
+        <option value="">Select brand…</option>
+        <option>MAC</option><option>Urban Decay</option><option>NARS</option>
+        <option>Charlotte Tilbury</option><option>Too Faced</option><option>Fenty Beauty</option>
+        <option>Anastasia Beverly Hills</option><option>Benefit</option><option>NYX</option>
+        <option>Maybelline</option><option>L'Oréal</option><option>Tarte</option>
+        <option>Rare Beauty</option><option>e.l.f.</option><option>Huda Beauty</option>
+        <option>Other (Add Custom)</option>
+      </select>
+    </div>
+    <div class="form-group" id="custom-brand-field" style="display:none;">
+      <label>Custom Brand Name</label>
+      <input type="text" id="manual-custom-brand" placeholder="Enter brand name">
+    </div>
+    <div class="form-group"><label>Product Name</label><input type="text" id="manual-name" placeholder="e.g. Ruby Woo Lipstick"></div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="manual-category">
+        <option value="">Select category…</option>
+        <option>Lipstick</option><option>Lip Gloss</option><option>Lip Liner</option>
+        <option>Foundation</option><option>Concealer</option><option>Blush</option>
+        <option>Bronzer</option><option>Highlighter</option><option>Eyeshadow Palette</option>
+        <option>Eyeliner</option><option>Mascara</option><option>Setting Powder</option>
+        <option>Setting Spray</option><option>Primer</option><option>Contour</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Shade (optional)</label><input type="text" id="manual-shade" placeholder="e.g. Ruby Woo, NW25"></div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-gray" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-rose" onclick="saveManualProduct()">Add to Vault</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'
+  : 'https://YOUR_RAILWAY_URL.railway.app';  // ← replace this after deploying to Railway
+let currentUser = null;
+let users = JSON.parse(localStorage.getItem('glamvault_users') || '{}');
+let currentIdentified = null;
+let currentImageData = null;
+let activeFilter = 'all';
+let cameraStream = null;
+let faceImageData = null;
+let faceAnalysisResult = null;
+const KNOWN_BRANDS = ['MAC','Urban Decay','NARS','Charlotte Tilbury','Too Faced','Fenty Beauty','Anastasia Beverly Hills','Benefit','NYX','Maybelline',"L'Oréal",'Tarte','Rare Beauty','e.l.f.','Huda Beauty'];
+const CATEGORY_EMOJIS = {'Lipstick':'💄','Lip Gloss':'✨','Lip Liner':'🖊️','Foundation':'🧴','Concealer':'🎭','Blush':'🌸','Bronzer':'☀️','Highlighter':'💫','Eyeshadow Palette':'🎨','Eyeliner':'✏️','Mascara':'👁️','Setting Powder':'🌟','Setting Spray':'💧','Primer':'🎬','Contour':'◼️'};
+
+// SERVER HEALTH CHECK
+async function checkServer() {
+  const badge = document.getElementById('server-badge');
+  try {
+    const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      badge.className = 'server-badge server-online';
+      badge.textContent = '⬤ ML Backend Online';
+    } else throw new Error();
+  } catch {
+    badge.className = 'server-badge server-offline';
+    badge.textContent = '⬤ Backend Offline';
+  }
+}
+
+// ── ONBOARDING ──
+let obSkipped = [];
+let obShadeTemp = { lip:[], eye:[], finish:[], skinTone:'' };
+
+function startOnboarding() {
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('ob-avatar').textContent = initials;
+  document.getElementById('ob-name').textContent = currentUser.name;
+  document.getElementById('ob-welcome-title').textContent = `Welcome to Glam Vault, ${currentUser.name.split(' ')[0]}!`;
+  obSkipped = []; obShadeTemp = { lip:[], eye:[], finish:[], skinTone: currentUser.skinTone||'' };
+  obGoTo(0);
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('onboarding-screen').classList.add('active');
+}
+
+function obGoTo(n) {
+  document.querySelectorAll('.ob-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('ob-pane-'+n).classList.add('active');
+  const bar = document.getElementById('ob-step-bar');
+  const pw = document.getElementById('ob-progress-wrap');
+  if (n===0) { bar.style.display='none'; pw.style.display='none'; return; }
+  bar.style.display='flex'; pw.style.display='block';
+  const pct = n>=4 ? 100 : Math.round((n/4)*100);
+  document.getElementById('ob-progress-fill').style.width = pct+'%';
+  document.getElementById('ob-step-label').textContent = n<4 ? `Step ${n} of 4` : 'All done!';
+  for (let d=1;d<=4;d++) {
+    const dot = document.getElementById('ob-dot-'+d);
+    if (dot) dot.className = 'ob-dot'+(d<n?' done':d===n?' active':'');
+  }
+  if (n===4) obBuildDone();
+}
+
+function obSkip(step) {
+  if (!obSkipped.includes(step)) obSkipped.push(step);
+  obGoTo(step+1);
+}
+
+function obSkipAll() {
+  obSkipped = [1,2,3];
+  obGoTo(4);
+}
+
+function obSelectTone(el, tone) {
+  document.querySelectorAll('.ob-tone-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  obShadeTemp.skinTone = tone;
+}
+
+function obToggleShade(el, cat, val) {
+  el.classList.toggle('selected');
+  if (!obShadeTemp[cat]) obShadeTemp[cat]=[];
+  const arr = obShadeTemp[cat];
+  const i = arr.indexOf(val);
+  if (i===-1) arr.push(val); else arr.splice(i,1);
+}
+
+function obHandleFace(e) {
+  if (!e.target.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    faceImageData = ev.target.result;
+    obGoTo(2);
+    document.getElementById('onboarding-screen').classList.remove('active');
+    document.getElementById('app-screen').classList.add('active');
+    obInitAppShell();
+    switchTab('face');
+    analyzeFace(faceImageData);
+  };
+  reader.readAsDataURL(e.target.files[0]);
+}
+
+function obSaveShades() {
+  currentUser.shadeProfile = {
+    skinTone: obShadeTemp.skinTone || currentUser.skinTone || '',
+    lip: obShadeTemp.lip||[],
+    eye: obShadeTemp.eye||[],
+    finish: obShadeTemp.finish||[],
+    blush: [],
+    foundationShade: ''
+  };
+  saveUser();
+  obGoTo(3);
+}
+
+function obBuildDone() {
+  const faceOk = !obSkipped.includes(1);
+  const shadesOk = !obSkipped.includes(2);
+  const productsOk = !obSkipped.includes(3);
+  const allSkipped = obSkipped.length===3;
+  const noneSkipped = obSkipped.length===0;
+
+  document.getElementById('ob-done-icon').textContent = noneSkipped ? '🎉' : allSkipped ? '✨' : '🌸';
+  document.getElementById('ob-done-title').textContent = noneSkipped ? "You're all set!" : allSkipped ? "Your vault is ready!" : "Great start!";
+  document.getElementById('ob-done-sub').textContent = noneSkipped
+    ? "Everything is set up — your vault is ready to use."
+    : allSkipped
+    ? "You skipped setup for now, which is totally fine. Complete it any time from within the app."
+    : "You can complete the skipped steps any time from within the app.";
+
+  document.getElementById('ob-done-summary').innerHTML = `
+    <div class="ob-stat"><div class="ob-stat-val">${faceOk?'✅':'—'}</div><div class="ob-stat-label">Face analyzed</div></div>
+    <div class="ob-stat"><div class="ob-stat-val">${shadesOk?'✅':'—'}</div><div class="ob-stat-label">Shade profile saved</div></div>
+    <div class="ob-stat"><div class="ob-stat-val">${productsOk?(currentUser.inventory||[]).length:'0'}</div><div class="ob-stat-label">Products added</div></div>
+    <div class="ob-stat"><div class="ob-stat-val">✨</div><div class="ob-stat-label">AI picks ready</div></div>`;
+
+  const box = document.getElementById('ob-skipped-box');
+  if (obSkipped.length>0) {
+    box.style.display='block';
+    const labels = {1:'Face selfie analysis',2:'Shade profile',3:'Adding products'};
+    document.getElementById('ob-skipped-list').innerHTML = obSkipped.map(s=>`<li>• ${labels[s]} — available in the app anytime</li>`).join('');
+  } else { box.style.display='none'; }
+}
+
+function obFinish() {
+  currentUser.onboardingDone = true;
+  if (obShadeTemp.skinTone && !obSkipped.includes(2)) {
+    currentUser.shadeProfile = { skinTone:obShadeTemp.skinTone, lip:obShadeTemp.lip||[], eye:obShadeTemp.eye||[], finish:obShadeTemp.finish||[], blush:[], foundationShade:'' };
+  }
+  saveUser();
+  document.getElementById('onboarding-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  obInitAppShell();
+  enterApp();
+}
+
+function obInitAppShell() {
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name-display').textContent = currentUser.name;
+}
+
+// ── AUTH ──
+function switchAuthTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')));
+  document.getElementById('login-panel').classList.toggle('active',tab==='login');
+  document.getElementById('signup-panel').classList.toggle('active',tab==='signup');
+}
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  if (!users[email] || users[email].password !== pass) { err.style.display='block'; return; }
+  err.style.display='none';
+  currentUser = { email, ...users[email] };
+  if (!currentUser.onboardingDone) { startOnboarding(); } else { enterApp(); }
+}
+
+function handleSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-password').value;
+  const tone = document.getElementById('signup-tone').value;
+  const err = document.getElementById('signup-error');
+  if (!name||!email||!pass) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  if (users[email]) { err.textContent='Account already exists.'; err.style.display='block'; return; }
+  err.style.display='none';
+  users[email] = { name, password:pass, skinTone:tone, inventory:[], shadeProfile:{skinTone:tone,finish:[],lip:[],eye:[],blush:[],foundationShade:''}, customBrands:[], faceProfile:null, onboardingDone:false };
+  localStorage.setItem('glamvault_users', JSON.stringify(users));
+  currentUser = { email, ...users[email] };
+  startOnboarding();
+}
+
+function handleLogout() {
+  currentUser = null; stopCamera();
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('onboarding-screen').classList.remove('active');
+  resetIdentify();
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  document.getElementById('user-avatar').textContent = currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-name-display').textContent = currentUser.name;
+  loadShadeProfile(); renderInventory(); checkServer();
+  if (currentUser.faceProfile) { faceAnalysisResult = currentUser.faceProfile; faceImageData = faceAnalysisResult.imageData; }
+  switchTab('identify');
+}
+
+function saveUser() {
+  users[currentUser.email] = { name:currentUser.name, password:currentUser.password, skinTone:currentUser.skinTone, inventory:currentUser.inventory, shadeProfile:currentUser.shadeProfile, customBrands:currentUser.customBrands, faceProfile:currentUser.faceProfile, onboardingDone:currentUser.onboardingDone };
+  localStorage.setItem('glamvault_users', JSON.stringify(users));
+}
+
+// NAV
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => { if (b.getAttribute('onclick')&&b.getAttribute('onclick').includes(`'${tab}'`)) b.classList.add('active'); });
+  document.getElementById(`${tab}-tab`).classList.add('active');
+  if (tab==='recs'&&currentUser&&(currentUser.shadeProfile?.skinTone)) fetchRecommendations();
+}
+
+// IDENTIFY
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+function handleDrop(e) { e.preventDefault(); handleDragLeave(e); if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
+function handleFileSelect(e) { if (e.target.files[0]) processFile(e.target.files[0]); }
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => { currentImageData = e.target.result; identifyProduct(currentImageData); };
+  reader.readAsDataURL(file);
+}
+
+async function identifyProduct(imageData) {
+  showLoading('Identifying your makeup product…', 'Claude Vision is analyzing the image');
+  try {
+    const res = await fetch(`${API}/api/identify-product`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ imageData, knownBrands: [...KNOWN_BRANDS, ...(currentUser.customBrands||[])] })
+    });
+    const result = await res.json();
+    if (result.error) throw new Error(result.error);
+    currentIdentified = { ...result, imageData };
+    hideLoading();
+    document.getElementById('result-img').src = imageData;
+    document.getElementById('result-brand').textContent = result.brand;
+    document.getElementById('result-name').textContent = result.name || 'Makeup Product';
+    document.getElementById('result-category').textContent = result.category;
+    document.getElementById('identify-ai-text').textContent = result.description;
+    if (result.shade) {
+      document.getElementById('shade-row').style.display = 'flex';
+      document.getElementById('shade-swatch').style.background = result.shadeHex || '#C49884';
+      document.getElementById('shade-label').textContent = 'Shade: ' + result.shade;
+    }
+    document.getElementById('identify-result').classList.add('visible');
+    if (!result.brandKnown && result.brand !== 'Unknown') document.getElementById('brand-not-found').style.display = 'block';
+  } catch(err) {
+    hideLoading(); showToast('Error: ' + err.message); console.error(err);
+  }
+}
+
+function resetIdentify() {
+  currentIdentified = null; currentImageData = null;
+  document.getElementById('identify-result').classList.remove('visible');
+  document.getElementById('brand-not-found').style.display = 'none';
+  document.getElementById('shade-row').style.display = 'none';
+  document.getElementById('file-input').value = '';
+}
+
+function addToInventory() {
+  if (!currentIdentified) return;
+  currentUser.inventory.push({ id:Date.now(), brand:currentIdentified.brand, name:currentIdentified.name||'Product', category:currentIdentified.category, shade:currentIdentified.shade, shadeHex:currentIdentified.shadeHex, imageData:currentIdentified.imageData, addedAt:new Date().toISOString() });
+  saveUser(); renderInventory(); showToast(`Added ${currentIdentified.name} to your vault! 💄`);
+  resetIdentify(); switchTab('inventory');
+}
+
+function addCustomBrand() {
+  const val = document.getElementById('custom-brand-input').value.trim();
+  if (!val) return;
+  if (!currentUser.customBrands) currentUser.customBrands = [];
+  if (!currentUser.customBrands.includes(val)) { currentUser.customBrands.push(val); saveUser(); showToast(`Added "${val}"!`); }
+  document.getElementById('custom-brand-input').value = '';
+  document.getElementById('brand-not-found').style.display = 'none';
+}
+
+// FACE ANALYSIS
+function handleFaceDrop(e) { e.preventDefault(); handleDragLeave(e); if (e.dataTransfer.files[0]) processFaceFile(e.dataTransfer.files[0]); }
+function handleFaceFileSelect(e) { if (e.target.files[0]) processFaceFile(e.target.files[0]); }
+
+function processFaceFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => { faceImageData = e.target.result; analyzeFace(faceImageData); };
+  reader.readAsDataURL(file);
+}
+
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'user'}, audio:false });
+    const video = document.getElementById('camera-video');
+    video.srcObject = cameraStream; video.style.display = 'block';
+    document.getElementById('start-cam-btn').style.display = 'none';
+    document.getElementById('capture-btn').style.display = 'inline-block';
+    document.getElementById('stop-cam-btn').style.display = 'inline-block';
+  } catch { showToast('Camera not available — please upload a photo instead.'); }
+}
+
+function capturePhoto() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('face-canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  faceImageData = canvas.toDataURL('image/jpeg', 0.9);
+  stopCamera(); analyzeFace(faceImageData);
+}
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  const video = document.getElementById('camera-video');
+  video.style.display = 'none'; video.srcObject = null;
+  document.getElementById('start-cam-btn').style.display = 'inline-block';
+  document.getElementById('capture-btn').style.display = 'none';
+  document.getElementById('stop-cam-btn').style.display = 'none';
+}
+
+async function analyzeFace(imageData) {
+  showLoading('Running ML face analysis…', 'MediaPipe detecting 468 landmarks • OpenCV color analysis • KMeans undertone detection');
+  try {
+    const res = await fetch(`${API}/api/analyze-face`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ imageData, shadeProfile: currentUser.shadeProfile || {} })
+    });
+    const result = await res.json();
+    if (result.error) throw new Error(result.error);
+    faceAnalysisResult = { ...result, imageData };
+    currentUser.faceProfile = faceAnalysisResult;
+    saveUser(); hideLoading(); showFaceResults(faceAnalysisResult);
+  } catch(err) {
+    hideLoading(); showToast('Analysis error: ' + err.message); console.error(err);
+  }
+}
+
+function showFaceResults(result) {
+  document.getElementById('face-upload-section').style.display = 'none';
+  document.getElementById('face-results-section').style.display = 'block';
+  document.getElementById('face-photo-display').src = result.imageData;
+  document.getElementById('face-result-headline').textContent = result.headline || 'Your Face Profile';
+  document.getElementById('face-result-sub').textContent = result.subtext || '';
+  document.getElementById('face-ai-narrative').textContent = result.narrative || '';
+
+  const features = result.features || [];
+  document.getElementById('face-feature-grid').innerHTML = features.map(f => `
+    <div class="feature-card">
+      <div class="feature-label">${f.label}</div>
+      <div class="feature-value">${capitalize(f.value||'')}</div>
+      <div class="feature-tip">${f.tip}</div>
+    </div>`).join('');
+}
+
+function showLooks() {
+  if (!faceAnalysisResult || !faceAnalysisResult.looks) return;
+  document.getElementById('looks-section').style.display = 'block';
+  document.getElementById('looks-sub').textContent = `6 looks designed for your ${faceAnalysisResult.faceShape} face & ${faceAnalysisResult.eyeShape} eyes`;
+  renderLooks(faceAnalysisResult.looks);
+  document.getElementById('looks-section').scrollIntoView({ behavior:'smooth' });
+}
+
+function renderLooks(looks) {
+  document.getElementById('looks-grid').innerHTML = looks.map(look => {
+    const pUrl = `https://pinterest.com/search/pins/?q=${encodeURIComponent(look.pinterestQuery||look.name+' makeup')}`;
+    const steps = (look.steps||[]).map(s => `<li style="font-size:13px;color:var(--muted);margin-bottom:4px;">• ${s}</li>`).join('');
+    const products = (look.keyProducts||[]).map(p => `<span class="look-tag" style="background:var(--rose-light);color:var(--rose);">✓ ${p}</span>`).join('');
+    const tags = (look.tags||[]).map(t => `<span class="look-tag">${t}</span>`).join('');
+    return `<div class="look-card">
+      <div class="look-card-banner ${look.bannerClass||'banner-default'}">
+        <span style="font-size:3.5rem;">${look.emoji||'💄'}</span>
+        <div class="look-card-vibe">${look.vibe}</div>
+      </div>
+      <div class="look-card-body">
+        <div class="look-name">${look.name}</div>
+        <div class="look-desc">${look.description}</div>
+        <div style="background:var(--gold-light);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--gold);line-height:1.4;">💡 ${look.whyItWorks}</div>
+        <ul style="list-style:none;padding:0;margin-bottom:10px;">${steps}</ul>
+        <div class="look-tags" style="margin-bottom:6px;">${products}</div>
+        <div class="look-tags" style="margin-bottom:12px;">${tags}</div>
+        <a href="${pUrl}" target="_blank" class="pinterest-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          Find this look on Pinterest
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function resetFaceAnalysis() {
+  faceImageData = null; faceAnalysisResult = null;
+  document.getElementById('face-upload-section').style.display = 'block';
+  document.getElementById('face-results-section').style.display = 'none';
+  document.getElementById('looks-section').style.display = 'none';
+  document.getElementById('face-file-input').value = '';
+}
+
+// INVENTORY
+function renderInventory() {
+  const inv = currentUser.inventory || [];
+  document.getElementById('inventory-count').textContent = `${inv.length} product${inv.length!==1?'s':''} saved`;
+  const brands = [...new Set(inv.map(p=>p.brand))];
+  const row = document.getElementById('brand-filters');
+  row.innerHTML = `<button class="filter-chip ${activeFilter==='all'?'active':''}" onclick="filterInventory('all',this)">All</button>`;
+  brands.forEach(b => { const c=document.createElement('button'); c.className=`filter-chip ${activeFilter===b?'active':''}`; c.textContent=b; c.onclick=()=>filterInventory(b,c); row.appendChild(c); });
+  const filtered = activeFilter==='all' ? inv : inv.filter(p=>p.brand===activeFilter);
+  const grid = document.getElementById('inventory-grid');
+  if (!filtered.length) { grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">💄</div><h3>${inv.length===0?'No products yet':'Nothing here'}</h3><p>${inv.length===0?'Use Identify tab!':'Try a different filter'}</p></div>`; return; }
+  grid.innerHTML = filtered.map(p=>`<div class="product-card" onclick="removeProduct(${p.id})">
+    <div class="product-img-wrap">${p.imageData?`<img src="${p.imageData}" alt="${p.name}">`:`<span>${CATEGORY_EMOJIS[p.category]||'💄'}</span>`}<div class="product-category-tag">${p.category||''}</div></div>
+    <div class="product-info"><div class="product-brand">${p.brand}</div><div class="product-name">${p.name}</div>${p.shade?`<div class="product-shade"><div class="mini-swatch" style="background:${p.shadeHex||'#C49884'}"></div>${p.shade}</div>`:''}</div>
+  </div>`).join('');
+}
+
+function filterInventory(brand, el) {
+  activeFilter = brand;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); renderInventory();
+}
+
+function removeProduct(id) {
+  const p = currentUser.inventory.find(x=>x.id==id);
+  if (!p) return;
+  if (confirm(`Remove "${p.name}"?`)) { currentUser.inventory = currentUser.inventory.filter(x=>x.id!=id); saveUser(); renderInventory(); showToast('Product removed.'); }
+}
+
+// MANUAL ADD
+function openManualAdd() {
+  const sel = document.getElementById('manual-brand');
+  const ex = [...sel.options].map(o=>o.value);
+  (currentUser.customBrands||[]).forEach(b=>{ if(!ex.includes(b)) sel.insertBefore(new Option(b,b),sel.lastElementChild); });
+  document.getElementById('manual-modal').classList.add('visible');
+}
+function closeModal() { document.getElementById('manual-modal').classList.remove('visible'); }
+document.getElementById('manual-brand').addEventListener('change', function() { document.getElementById('custom-brand-field').style.display=this.value==='Other (Add Custom)'?'block':'none'; });
+function saveManualProduct() {
+  let brand = document.getElementById('manual-brand').value;
+  if (brand==='Other (Add Custom)') brand = document.getElementById('manual-custom-brand').value.trim();
+  const name = document.getElementById('manual-name').value.trim();
+  const category = document.getElementById('manual-category').value;
+  const shade = document.getElementById('manual-shade').value.trim();
+  if (!brand||!name||!category) { showToast('Please fill brand, name & category.'); return; }
+  currentUser.inventory.push({ id:Date.now(), brand, name, category, shade, shadeHex:'', imageData:'', addedAt:new Date().toISOString() });
+  saveUser(); renderInventory(); closeModal(); showToast(`Added ${name}! 💄`);
+  ['manual-name','manual-shade'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('manual-brand').value=''; document.getElementById('manual-category').value='';
+}
+document.getElementById('manual-modal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+// SHADE PROFILE
+function loadShadeProfile() {
+  const sp = currentUser.shadeProfile || {};
+  if (sp.skinTone) document.querySelectorAll('.tone-option').forEach(el=>el.classList.toggle('selected',el.dataset.tone===sp.skinTone));
+  ['finish','lip','eye','blush'].forEach(cat => {
+    const vals = sp[cat] || [];
+    document.querySelectorAll(`#${cat}-prefs .shade-pill`).forEach(pill => {
+      const m = pill.getAttribute('onclick').match(/'([^']+)'\)$/);
+      if (m && vals.includes(m[1])) pill.classList.add('selected');
+    });
+  });
+  if (sp.foundationShade) document.getElementById('foundation-shade').value = sp.foundationShade;
+}
+function selectTone(el, tone) { document.querySelectorAll('.tone-option').forEach(e=>e.classList.remove('selected')); el.classList.add('selected'); if(!currentUser.shadeProfile) currentUser.shadeProfile={}; currentUser.shadeProfile.skinTone=tone; }
+function toggleShade(el, cat, val) { el.classList.toggle('selected'); if(!currentUser.shadeProfile) currentUser.shadeProfile={}; if(!currentUser.shadeProfile[cat]) currentUser.shadeProfile[cat]=[]; const arr=currentUser.shadeProfile[cat]; const i=arr.indexOf(val); if(i===-1) arr.push(val); else arr.splice(i,1); }
+function saveShadeProfile() { if(!currentUser.shadeProfile) currentUser.shadeProfile={}; currentUser.shadeProfile.foundationShade=document.getElementById('foundation-shade').value.trim(); saveUser(); showToast('Shade profile saved! ✨'); }
+
+// RECOMMENDATIONS
+async function fetchRecommendations() {
+  const sp = currentUser.shadeProfile;
+  if (!sp?.skinTone) { showToast('Set your skin tone in My Shades first!'); return; }
+  showLoading('Curating your personalized picks…', 'Claude AI is crafting shade-matched recommendations');
+  try {
+    const res = await fetch(`${API}/api/recommendations`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ shadeProfile:sp, faceData:faceAnalysisResult||{}, inventory:currentUser.inventory||[] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    hideLoading();
+    const faceExtra = faceAnalysisResult ? ` & your ${faceAnalysisResult.faceShape} face shape` : '';
+    document.getElementById('reco-intro-text').textContent = `Based on your ${sp.skinTone} skin tone${faceExtra} — here's what we think you'll love.`;
+    document.getElementById('reco-grid').innerHTML = data.recommendations.map(r=>`
+      <div class="reco-card">
+        <div class="reco-header"><span class="reco-emoji">${r.emoji||'💄'}</span><div><div class="reco-brand">${r.brand}</div><div class="reco-name">${r.name}</div></div></div>
+        <p class="reco-reason">${r.reason}</p>
+        <div class="reco-shade-match"><div class="mini-swatch" style="background:${r.shadeHex||'#C49884'};width:16px;height:16px;"></div>Shade: <strong>${r.shade}</strong></div>
+        <div style="margin-top:10px;"><button class="btn-sm btn-outline" style="width:100%;font-size:12px;" onclick="addRecToInventory('${esc(r.brand)}','${esc(r.name)}','${esc(r.category||'')}','${esc(r.shade)}','${r.shadeHex||''}')">Add to Vault</button></div>
+      </div>`).join('');
+  } catch(err) { hideLoading(); showToast('Error: '+err.message); console.error(err); }
+}
+
+function addRecToInventory(brand, name, category, shade, shadeHex) {
+  currentUser.inventory.push({ id:Date.now(), brand, name, category, shade, shadeHex, imageData:'', addedAt:new Date().toISOString() });
+  saveUser(); renderInventory(); showToast(`Added ${name}! 💄`);
+}
+
+// UTILS
+function showLoading(text, sub='') { document.getElementById('loading-text').textContent=text; document.getElementById('loading-sub').textContent=sub; document.getElementById('loading-overlay').classList.add('visible'); }
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('visible'); }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function capitalize(s) { return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
+function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
